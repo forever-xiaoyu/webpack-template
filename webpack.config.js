@@ -98,10 +98,16 @@ module.exports = {
           'postcss-loader',
           'sass-loader'
         ]
+      },
+      {
+        test: /\.art$/,
+        loader: 'art-template-loader'
       }
     ]
   },
 
+  mode: 'development', // 开发模式
+  devtool: 'source-map', // 开启调试
   devServer: {
     contentBase: resolvePath('deploy'),
     port: 8080, // 本地服务器端口号
