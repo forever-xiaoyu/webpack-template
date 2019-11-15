@@ -14,11 +14,10 @@ import './styles/index.scss'
 // })
 
 $(function () {
-  const render = require('./templates/header/header.art')
-  const data = {
-    title: 'title23 is template'
+  const headerRender = require('./templates/header/header.art')
+  const headerData = {
+    title: 'header template'
   }
-  const html = render(data)
+  const html = headerRender(headerData)
   $('#app').html(html)
-  console.log('test')
 })
