@@ -1,4 +1,4 @@
-require("expose-loader?$!jquery")
+// require("expose-loader?$!jquery")
 import './styles/index.scss'
 
 // 测试 ES6 语法是否通过 babel 转译

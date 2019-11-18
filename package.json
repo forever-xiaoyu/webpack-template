@@ -4,11 +4,11 @@
   "description": "a project based on webpack",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack-dev-server --open",
-    "serve": "webpack-dev-server --open",
-    "build:yufa": "webpack --mode development",
-    "build:prod": "webpack --mode production",
-    "build": "webpack --mode production"
+    "dev": "webpack-dev-server --env development --open --config build/webpack.base.conf.js",
+    "serve": "webpack-dev-server --env development --open --config build/webpack.base.conf.js",
+    "build:yufa": "webpack --env development --config build/webpack.base.conf.js",
+    "build:prod": "webpack --env production --config build/webpack.base.conf.js",
+    "build": "webpack --env production --config build/webpack.base.conf.js"
   },
   "author": "yuce",
   "license": "MIT",
@@ -39,15 +39,11 @@
     "url-loader": "^2.2.0",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10",
-    "webpack-dev-server": "^3.9.0"
+    "webpack-dev-server": "^3.9.0",
+    "webpack-merge": "^4.2.2"
   },
   "dependencies": {
     "@babel/polyfill": "^7.7.0",
     "@babel/runtime": "^7.7.2"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 version",
-    "not ie <= 8"
-  ]
+  }
 }

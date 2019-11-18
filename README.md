@@ -45,9 +45,9 @@ online demo https://jeromehan.github.io/webpack-jquery/dist/
     │   │   ├── pageA.js              # 页面A入口
     │   │   ├── lib/              # 没有存放在npm的第三方库或者下载存放到本地的基础库，如jQuery、Zepto、React等
     │   ├── pathmap.json          # 手动配置某些模块的路径，可以加快webpack的编译速度
-    ├── webpack.base.config.js    # webpack配置
-    ├── webpack.base.config.js         # 正式环境webpack配置入口
-    └── webpack.dev.config.js     # 开发环境webpack配置入口
+    ├── webpack.base.conf.js    # webpack配置
+    ├── webpack.base.conf.js         # 正式环境webpack配置入口
+    └── webpack.dev.conf.js     # 开发环境webpack配置入口
 ```
 
 ## 开发要求 ##
