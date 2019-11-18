@@ -16,7 +16,7 @@ import './styles/index.scss'
 $(function () {
   const headerRender = require('./templates/header/header.art')
   const headerData = {
-    title: 'header template'
+    title: 'header template test'
   }
   const html = headerRender(headerData)
   $('#app').html(html)

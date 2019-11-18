@@ -8,7 +8,8 @@
     "serve": "webpack-dev-server --env development --open --config build/webpack.base.conf.js",
     "build:yufa": "webpack --env development --config build/webpack.base.conf.js",
     "build:prod": "webpack --env production --config build/webpack.base.conf.js",
-    "build": "webpack --env production --config build/webpack.base.conf.js"
+    "build": "webpack --env production --config build/webpack.base.conf.js",
+    "report": "webpack --env report --config build/webpack.base.conf.js"
   },
   "author": "yuce",
   "license": "MIT",
@@ -38,6 +39,7 @@
     "style-loader": "^1.0.0",
     "url-loader": "^2.2.0",
     "webpack": "^4.41.2",
+    "webpack-bundle-analyzer": "^3.6.0",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.9.0",
     "webpack-merge": "^4.2.2"
