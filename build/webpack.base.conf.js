@@ -11,15 +11,15 @@ const productionConfig = require('./webpack.prod.conf')
 
 /**
  * 根据不同的环境，生成不同的配置
- * @param {String} env "development" or "production" or "report
+ * @param {String} env "development" or "production" or "report"
  */
 const generateConfig = (env, isProduction) => {
   // 将需要的 Loader 和 Plugin 单独声明
-  let htmlLoader = [
-    {
-      loader: 'html-loader'
-    }
-  ]
+  // let htmlLoader = [
+  //   {
+  //     loader: 'html-loader'
+  //   }
+  // ]
 
   let scriptLoader = [
     {
