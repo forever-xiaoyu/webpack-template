@@ -15,6 +15,12 @@ const productionConfig = require('./webpack.prod.conf')
  */
 const generateConfig = (env, isProduction) => {
   // 将需要的 Loader 和 Plugin 单独声明
+  let htmlLoader = [
+    {
+      loader: 'html-loader'
+    }
+  ]
+
   let scriptLoader = [
     {
       loader: 'babel-loader'
@@ -81,12 +87,6 @@ const generateConfig = (env, isProduction) => {
       ? cssExtractLoader // 生产环境下压缩 css 代码
       : cssLoader // 开发环境：页内样式嵌入
 
-  let artLoader = [
-    {
-      loader: 'art-template-loader'
-    }
-  ]
-
   // 开发环境和生产环境二者均需要的插件
   // plugins 中使用条件判断会产生错误，在外部进行判断然后 push 进去
   let plugins = [
@@ -99,8 +99,6 @@ const generateConfig = (env, isProduction) => {
         collapseWhitespace: true
       }
     }),
-    // 暴漏全局变量
-    new webpack.ProvidePlugin({ $: 'jquery' }),
     // 清除打包目录
     new CleanWebpackPlugin(),
   ]
@@ -133,11 +131,11 @@ const generateConfig = (env, isProduction) => {
     },
     module: {
       rules: [
-        { test: /\.js$/, exclude: /(node_modules)/, use: scriptLoader },
+        // { test: /\.html$/, use: htmlLoader },
         { test: /\.(sa|sc|c)ss$/, use: styleLoader },
+        { test: /\.js$/, exclude: /(node_modules)/, use: scriptLoader },
         { test: /\.(eot|woff2?|ttf|svg)$/, use: fontLoader },
-        { test: /\.(png|jpg|jpeg|gif)$/, use: imageLoader },
-        { test: /\.art$/, use: artLoader },
+        { test: /\.(png|jpg|jpeg|gif)$/, use: imageLoader }
       ]
     },
     plugins
