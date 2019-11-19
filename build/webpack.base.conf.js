@@ -4,6 +4,7 @@ const merge = require('webpack-merge')
 const resolvePath = dir => path.join(__dirname, '..', dir)
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 const developmentConfig = require('./webpack.dev.conf')
@@ -11,7 +12,7 @@ const productionConfig = require('./webpack.prod.conf')
 
 /**
  * 根据不同的环境，生成不同的配置
- * @param {String} env "development" or "production" or "report
+ * @param {String} env "development" or "production" or "report"
  */
 const generateConfig = (env, isProduction) => {
   // 将需要的 Loader 和 Plugin 单独声明
@@ -91,7 +92,7 @@ const generateConfig = (env, isProduction) => {
   // plugins 中使用条件判断会产生错误，在外部进行判断然后 push 进去
   let plugins = [
     new HtmlWebpackPlugin({
-      title: 'webpack HTML',
+      title: 'SAAS',
       filename: 'index.html',
       template: resolvePath('./src/public/index.html'),
       // chunks: ['app'],
@@ -103,6 +104,14 @@ const generateConfig = (env, isProduction) => {
     new webpack.ProvidePlugin({ $: 'jquery' }),
     // 清除打包目录
     new CleanWebpackPlugin(),
+    // 拷贝静态资源
+    new CopyWebpackPlugin([
+      {
+        from: resolvePath('./src/public/src'),
+        to: resolvePath('deploy/src'),
+        ignore: ['.*']
+      }
+    ])
   ]
 
   // 模块打包可视化分析
@@ -131,10 +140,17 @@ const generateConfig = (env, isProduction) => {
       filename: '[name]-[hash:5].bundle.js',
       chunkFilename: '[name]-[hash:5].chunk.js'
     },
+    resolve: {
+      alias: {
+        "@s": resolvePath('src/styles'), // 基础样式
+        "@t": resolvePath('src/templates'), // 模块路径
+        "@u": resolvePath('src/utils'), // 工具路径
+      }
+    },
     module: {
       rules: [
-        { test: /\.js$/, exclude: /(node_modules)/, use: scriptLoader },
         { test: /\.(sa|sc|c)ss$/, use: styleLoader },
+        { test: /\.js$/, exclude: /(node_modules)/, use: scriptLoader },
         { test: /\.(eot|woff2?|ttf|svg)$/, use: fontLoader },
         { test: /\.(png|jpg|jpeg|gif)$/, use: imageLoader },
         { test: /\.art$/, use: artLoader },
