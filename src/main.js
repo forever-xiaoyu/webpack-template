@@ -1,4 +1,4 @@
-require('./styles/index.scss')
+require('@s/index.scss')
 
-require('./templates/header')
-require('./templates/footer')
+require('@t/header')
+require('@t/footer')

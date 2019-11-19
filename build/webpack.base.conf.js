@@ -91,9 +91,18 @@ const generateConfig = (env, isProduction) => {
   // plugins 中使用条件判断会产生错误，在外部进行判断然后 push 进去
   let plugins = [
     new HtmlWebpackPlugin({
-      title: 'webpack HTML',
+      title: 'SAAS',
       filename: 'index.html',
       template: resolvePath('./src/public/index.html'),
+      // chunks: ['app'],
+      minify: {
+        collapseWhitespace: true
+      }
+    }),
+    new HtmlWebpackPlugin({
+      title: 'INDEX2 HTML',
+      filename: 'index2.html',
+      template: resolvePath('./src/public/index2.html'),
       // chunks: ['app'],
       minify: {
         collapseWhitespace: true
@@ -128,6 +137,13 @@ const generateConfig = (env, isProduction) => {
       path: resolvePath('deploy'),
       filename: '[name]-[hash:5].bundle.js',
       chunkFilename: '[name]-[hash:5].chunk.js'
+    },
+    resolve: {
+      alias: {
+        "@s": resolvePath('src/styles'), // 基础样式
+        "@t": resolvePath('src/templates'), // 模块路径
+        "@u": resolvePath('src/utils'), // 工具路径
+      }
     },
     module: {
       rules: [
