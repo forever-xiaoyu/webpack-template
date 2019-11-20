@@ -31,16 +31,18 @@ const generateConfig = (env, isProduction) => {
     'style-loader',
     'css-loader',
     'postcss-loader', // 使用 postcss 为 css 加上浏览器前缀
+    'resolve-url-loader',
     'sass-loader' // 使用 sass-loader 将 scss 转为 css
   ]
 
   let cssExtractLoader = [
     {
-      loader: MiniCssExtractPlugin.loader
+      loader: MiniCssExtractPlugin.loader,
     },
     'css-loader',
     'postcss-loader', // 使用 postcss 为 css 加上浏览器前缀
-    'sass-loader', // 使用 sass-loader 将 scss 转为 css
+    'resolve-url-loader', // sourceMap 必须为 true 才能正确解析图片相对路径
+    'sass-loader?sourceMap', // 使用 sass-loader 将 scss 转为 css
   ]
 
   let fontLoader = [
@@ -49,7 +51,7 @@ const generateConfig = (env, isProduction) => {
       options: {
         name: '[name]-[hash:5].min.[ext]',
         limit: 5000, // fonts file size <= 5KB, use 'base64'; else, output svg file
-        publicPath: 'fonts/',
+        // publicPath: 'fonts/',
         outputPath: 'fonts/'
       }
     }
@@ -61,7 +63,8 @@ const generateConfig = (env, isProduction) => {
       options: {
         name: '[name]-[hash:5].min.[ext]',
         limit: 10000, // size <= 10KB
-        outputPath: 'images/'
+        // publicPath: '/',
+        outputPath: 'img/'
       }
     },
     // 图片压缩
