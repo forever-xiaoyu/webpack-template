@@ -6,6 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const WebpackBar = require('webpackbar')
 const developmentConfig = require('./webpack.dev.conf')
 const productionConfig = require('./webpack.prod.conf')
 
@@ -113,6 +114,7 @@ const generateConfig = (env, isProduction) => {
     }),
     // 清除打包目录
     new CleanWebpackPlugin(),
+    new WebpackBar()
   ]
 
   // 模块打包可视化分析
