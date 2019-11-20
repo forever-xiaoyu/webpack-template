@@ -14,10 +14,14 @@ import './styles/index.scss'
 // })
 
 $(function () {
-  const headerRender = require('./templates/header/header.art')
+  const headerRender = require('./templates/header.art')
   const headerData = {
     title: 'header template'
   }
-  const html = headerRender(headerData)
+  let html = headerRender(headerData)
   $('#saas-container').html(html)
+
+  const footerRender = require('./templates/footer.art')
+  html = footerRender({})
+  $('#saas-container').append(html)
 })

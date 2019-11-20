@@ -1,0 +1,3 @@
+<div class="saas-header">
+  <div class="header-left">{{title}}</div>
+</div>
