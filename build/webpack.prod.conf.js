@@ -4,16 +4,16 @@ const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin') //
 module.exports = {
   mode: 'production',
   optimization: {
-    splitChunks: {
-      chunks: 'all',
-      cacheGroups: {
-        jquery: {
-          name: 'chunk-jquery', // 单独将 jquery 拆包
-          priority: 15,
-          test: /[\\/]node_modules[\\/]jquery[\\/]/
-        }
-      }
-    }
+    // splitChunks: {
+    //   chunks: 'all',
+    //   cacheGroups: {
+    //     jquery: {
+    //       name: 'chunk-jquery', // 单独将 jquery 拆包
+    //       priority: 15,
+    //       test: /[\\/]node_modules[\\/]jquery[\\/]/
+    //     }
+    //   }
+    // }
   },
   plugins: [
     new MiniCssExtractPlugin({
