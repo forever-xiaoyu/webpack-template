@@ -135,7 +135,7 @@ function jsonp (params) {
   }
 }
 
-module.exports = {
+export {
   json,
   jsonp
 }

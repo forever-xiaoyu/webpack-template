@@ -13,4 +13,6 @@ window.onload = function () {
   var footerRender = require('./templates/footer.art')
   html = footerRender({})
   document.getElementById('saas-container').innerHTML += html
+
+  // 渲染 menu 菜单
 }
