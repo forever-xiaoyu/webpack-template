@@ -28,7 +28,7 @@ const generateConfig = (env, isProduction) => {
     'css-loader',
     'postcss-loader', // 使用 postcss 为 css 加上浏览器前缀
     'resolve-url-loader',
-    'sass-loader' // 使用 sass-loader 将 scss 转为 css
+    'sass-loader?sourceMap' // 使用 sass-loader 将 scss 转为 css
   ]
 
   let cssExtractLoader = [
@@ -82,9 +82,9 @@ const generateConfig = (env, isProduction) => {
   ]
 
   let styleLoader =
-    isProduction
-      ? cssExtractLoader // 生产环境下压缩 css 代码
-      : cssLoader // 开发环境：页内样式嵌入
+    env === 'css'
+      ? cssExtractLoader // 压缩 css 代码
+      : cssLoader // 页内样式嵌入
 
   let artLoader = [
     {
@@ -104,8 +104,6 @@ const generateConfig = (env, isProduction) => {
         collapseWhitespace: true
       }
     }),
-    // 暴漏全局变量
-    new webpack.ProvidePlugin({ $: 'jquery' }),
     // 清除打包目录
     new CleanWebpackPlugin(),
     new WebpackBar(),
@@ -167,7 +165,7 @@ const generateConfig = (env, isProduction) => {
 
 module.exports = env => {
   const isProduction =
-    (env === 'production' || env === 'report')
+    (env === 'production' || env === 'report' || env === 'css')
       ? true
       : false
   let config =
