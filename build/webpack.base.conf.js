@@ -96,10 +96,19 @@ const generateConfig = (env, isProduction) => {
   // plugins 中使用条件判断会产生错误，在外部进行判断然后 push 进去
   let plugins = [
     new HtmlWebpackPlugin({
-      title: 'SAAS',
+      title: 'Webpack',
       filename: 'index.html',
       template: resolvePath('./src/public/index.html'),
-      // chunks: ['app'],
+      chunks: ['app'],
+      minify: {
+        collapseWhitespace: true
+      }
+    }),
+    new HtmlWebpackPlugin({
+      title: 'demo',
+      filename: 'demo.html',
+      template: resolvePath('./src/views/demo/demo.html'),
+      chunks: ['demo'],
       minify: {
         collapseWhitespace: true
       }

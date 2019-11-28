@@ -1,4 +1,26 @@
 var utils = {
+  ready: function (fn) {
+    if (document.addEventListener) { // 非IE
+      document.addEventListener("DOMContentLoaded", eventHandler, false)
+    } else if (document.attachEvent) { // IE
+      document.onreadystatechange = function() {
+        if (document.readyState == 'complete') {
+          document.onreadystatechange = null
+          document.attachEvent("onreadystatechange", eventHandler)
+        }
+      }
+    }
+
+    function eventHandler () {
+      if (document.addEventListener) {
+        document.removeEventListener("DOMContentLoaded", eventHandler, false)
+      } else if (document.attachEvent) {
+        document.detachEvent("onreadystatechange", eventHandler)
+      }
+      fn()
+    }
+  },
+
   toLoginPage: function (returnUrl) {
     var passport = 'https://plogin.m.jd.com/user/login.action?appid=877&returnurl='
     var redirectUrl = `${passport}${encodeURIComponent(returnUrl || window.location.href)}`
