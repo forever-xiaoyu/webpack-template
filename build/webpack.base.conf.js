@@ -10,6 +10,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const WebpackBar = require('webpackbar')
 const developmentConfig = require('./webpack.dev.conf')
 const productionConfig = require('./webpack.prod.conf')
+const Config = require('./config')
 
 /**
  * 根据不同的环境，生成不同的配置
@@ -96,7 +97,7 @@ const generateConfig = (env, isProduction) => {
   // plugins 中使用条件判断会产生错误，在外部进行判断然后 push 进去
   let plugins = [
     new HtmlWebpackPlugin({
-      title: 'Webpack',
+      title: Config.INDEX_TITLE,
       filename: 'index.html',
       template: resolvePath('./src/public/index.html'),
       chunks: ['app'],
@@ -105,7 +106,7 @@ const generateConfig = (env, isProduction) => {
       }
     }),
     new HtmlWebpackPlugin({
-      title: 'demo',
+      title: Config.DEMO_TITLE,
       filename: 'demo.html',
       template: resolvePath('./src/views/demo/demo.html'),
       chunks: ['demo'],
@@ -123,7 +124,17 @@ const generateConfig = (env, isProduction) => {
         to: resolvePath('deploy/src'),
         ignore: ['.*']
       }
-    ])
+    ]),
+    // 因为 DefinePlugin 直接执行文本替换，给定的值必须包含字符串本身内的实际引号
+    new webpack.DefinePlugin({
+      'process.env': {
+        // 定义网关路径
+        BASE_URL:
+          isProduction
+            ? Config.BASE_URL
+            : Config.BASE_URL_DEV,
+      }
+    }),
   ]
 
   // 模块打包可视化分析
@@ -145,7 +156,10 @@ const generateConfig = (env, isProduction) => {
   }
 
   return {
-    entry: { app: './src/main.js' },
+    entry: {
+      app: './src/main.js',
+      demo: './src/views/demo/demo.js'
+    },
     output: {
       publicPath: isProduction ? './' : '/',
       path: resolvePath('deploy'),
