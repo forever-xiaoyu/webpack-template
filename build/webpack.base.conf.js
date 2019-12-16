@@ -18,6 +18,11 @@ const Config = require('./config')
  */
 const generateConfig = (env, isProduction) => {
   // 将需要的 Loader 和 Plugin 单独声明
+  // HtmlWebpackPlugin 会和 htmlLoader 冲突, 若在 html 中使用图片可使用 <%= require('') %> 来引入
+  // let htmlLoader = [
+  //   'html-withimg-loader'
+  // ]
+
   let scriptLoader = [
     {
       loader: 'babel-loader'
@@ -175,6 +180,7 @@ const generateConfig = (env, isProduction) => {
     },
     module: {
       rules: [
+        // { test: /\.(htm|html)$/, use: htmlLoader },
         { test: /\.(sa|sc|c)ss$/, use: styleLoader },
         { test: /\.js$/, exclude: /(node_modules)/, use: scriptLoader },
         { test: /\.(eot|woff2?|ttf|svg)$/, use: fontLoader },
