@@ -1,139 +1,206 @@
 const path = require('path')
 const webpack = require('webpack')
+const merge = require('webpack-merge')
+const resolvePath = dir => path.join(__dirname, '..', dir)
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
-const resolvePath = dir => path.join(__dirname, '..', dir)
-const isProduction = process.env.NODE_ENV === 'production'
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const WebpackBar = require('webpackbar')
+const developmentConfig = require('./webpack.dev.conf')
+const productionConfig = require('./webpack.prod.conf')
+const Config = require('./config')
 
-module.exports = {
-  entry: {
-    // 需要打包的文件入口
-    app: './src/main.js'
-  },
+/**
+ * 根据不同的环境，生成不同的配置
+ * @param {String} env "development" or "production" or "report"
+ */
+const generateConfig = (env, isProduction) => {
+  // 将需要的 Loader 和 Plugin 单独声明
+  // HtmlWebpackPlugin 会和 htmlLoader 冲突, 若在 html 中使用图片可使用 <%= require('') %> 来引入
+  // let htmlLoader = [
+  //   'html-withimg-loader'
+  // ]
 
-  output: {
-    // js 引用的路径或者 CDN 地址
-    publicPath: '/',
-    // 打包文件的输出目录
-    path: resolvePath('deploy'),
-    // 打包后生产的 js 文件
-    filename: '[name].bundle.js',
-    // 代码拆分后的文件名
-    chunkFilename: '[name].js'
-  },
+  let scriptLoader = [
+    {
+      loader: 'babel-loader'
+    }
+  ]
 
-  plugins: [
-    new HtmlWebpackPlugin({
-      // 打包输出HTML
-      title: 'SAAS',
-      // 压缩 HTML 文件
-      minify: {
-        // 移除 HTML 中的注释
-        removeComments: true,
-        // 删除空白符与换行符
-        collapseWhitespace: true,
-        // 压缩内联 css
-        minifyCSS: true
-      },
-      // 生成后的文件名
-      filename: 'index.html',
-      // 根据此模版生成 HTML 文件
-      template: './src/public/index.html',
-      chunks: ['app']
-    }),
+  let cssLoader = [
+    'style-loader',
+    'css-loader',
+    'postcss-loader', // 使用 postcss 为 css 加上浏览器前缀
+    'resolve-url-loader',
+    'sass-loader?sourceMap' // 使用 sass-loader 将 scss 转为 css
+  ]
 
-    new MiniCssExtractPlugin({
-      filename: '[name].css',
-      chunkFilename: '[id].css'
-    }),
+  let cssExtractLoader = [
+    {
+      loader: MiniCssExtractPlugin.loader
+    },
+    'css-loader',
+    'postcss-loader', // 使用 postcss 为 css 加上浏览器前缀
+    'resolve-url-loader', // sourceMap 必须为 true 才能正确解析图片相对路径
+    'sass-loader?sourceMap', // 使用 sass-loader 将 scss 转为 css
+  ]
 
-    new OptimizeCssAssetsPlugin({
-      assetNameRegExp: /\.css$/g,
-      // 用于优化\最小化 CSS 的 CSS处理器，默认为 cssnano
-      cssProcessor: require('cssnano'),
-      // 传递给 cssProcessor 的选项，默认为{}
-      cssProcessorOptions: { safe: true, discardComments: { removeAll: true } },
-      // 布尔值，指示插件是否可以将消息打印到控制台，默认为 true
-      canPrint: true
-    }),
-
-    // 默认情况下，此插件将删除 webpack output.path目录中的所有文件
-    // 以及每次成功重建后所有未使用的 webpack 资产
-    new CleanWebpackPlugin(),
-
-    // 热部署模块
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NamedModulesPlugin()
-  ],
-
-  module: {
-    rules: [
-      // {
-      //   loader: 'expose-loader',
-      //   options: 'jQuery'
-      // },
-      // {
-      //   loader: 'expose-loader',
-      //   options: '$'
-      // }
-      {
-        // 使用正则来匹配 js 文件
-        test: /\.js$/,
-        // 排除依赖包文件夹
-        exclude: /node_modules/,
-        use: {
-          // 使用 babel-loader
-          loader: 'babel-loader'
-        }
-      },
-      {
-        // 针对相应后缀的文件设置 loader
-        test: /\.(sa|sc|c)ss$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader
-          },
-          'css-loader',
-          'postcss-loader',
-          'sass-loader'
-        ]
-      },
-      {
-        test: /\.art$/,
-        loader: 'art-template-loader'
-      },
-      {
-        test: /.(jpg|png)$/,
-        use: {
-          loader: 'url-loader'
-        }
+  let fontLoader = [
+    {
+      loader: 'url-loader',
+      options: {
+        name: '[name]-[hash:5].min.[ext]',
+        limit: 5000, // fonts file size <= 5KB, use 'base64'; else, output svg file
+        // publicPath: 'fonts/',
+        outputPath: 'fonts/'
       }
-    ]
-  },
+    }
+  ]
 
-  mode: 'development', // 开发模式
-  devtool: 'source-map', // 开启调试
-  devServer: {
-    contentBase: resolvePath('deploy'),
-    port: 8080, // 本地服务器端口号
-    hot: true, // 热重载
-    overlay: true, // 如果代码出错，会在浏览器页面弹出“浮动层”。类似于 vue-cli 等脚手架
-    proxy: {
-      // 跨域代理转发
-      '/comments': {
-        target: 'https://m.weibo.cn',
-        changeOrigin: true,
-        logLevel: 'debug',
-        headers: {
-          Cookie: ''
-        }
+  let imageLoader = [
+    {
+      loader: 'url-loader',
+      options: {
+        name: '[name]-[hash:5].min.[ext]',
+        limit: 10000, // size <= 10KB
+        // publicPath: '/',
+        outputPath: 'img/'
       }
     },
-    historyApiFallback: {
-      // HTML5 history模式
-      rewrites: [{ from: /.*/, to: '/index.html' }]
+    // 图片压缩
+    // {
+    //   loader: 'image-webpack-loader',
+    //   options: {
+    //     // 压缩 jpg/jpeg 图片
+    //     mozjpeg: {
+    //       progressive: true,
+    //       quality: 50 // 压缩率
+    //     },
+    //     // 压缩 png 图片
+    //     pngquant: {
+    //       quality: '65-90',
+    //       speed: 4
+    //     }
+    //   }
+    // }
+  ]
+
+  let styleLoader =
+    env === 'css'
+      ? cssExtractLoader // 压缩 css 代码
+      : cssLoader // 页内样式嵌入
+
+  let artLoader = [
+    {
+      loader: 'art-template-loader'
     }
+  ]
+
+  // 开发环境和生产环境二者均需要的插件
+  // plugins 中使用条件判断会产生错误，在外部进行判断然后 push 进去
+  let plugins = [
+    new HtmlWebpackPlugin({
+      title: Config.INDEX_TITLE,
+      filename: 'index.html',
+      template: resolvePath('./src/public/index.html'),
+      chunks: ['app'],
+      minify: {
+        collapseWhitespace: true
+      }
+    }),
+    new HtmlWebpackPlugin({
+      title: Config.DEMO_TITLE,
+      filename: 'demo.html',
+      template: resolvePath('./src/views/demo/demo.html'),
+      chunks: ['demo'],
+      minify: {
+        collapseWhitespace: true
+      }
+    }),
+    // 清除打包目录
+    new CleanWebpackPlugin(),
+    new WebpackBar(),
+    // 拷贝静态资源
+    new CopyWebpackPlugin([
+      {
+        from: resolvePath('./src/public/src'),
+        to: resolvePath('deploy/src'),
+        ignore: ['.*']
+      }
+    ]),
+    // 因为 DefinePlugin 直接执行文本替换，给定的值必须包含字符串本身内的实际引号
+    new webpack.DefinePlugin({
+      'process.env': {
+        // 定义网关路径
+        BASE_URL:
+          isProduction
+            ? Config.BASE_URL
+            : Config.BASE_URL_DEV,
+      }
+    }),
+  ]
+
+  // 模块打包可视化分析
+  if (env === 'report') {
+    plugins.push(
+      new BundleAnalyzerPlugin({
+        analyzerMode: "static",
+        analyzerHost: "127.0.0.1",
+        analyzerPort: 8888,
+        reportFilename: "report.html",
+        defaultSizes: "parsed",
+        openAnalyzer: false,
+        generateStatsFile: false,
+        statsFilename: "stats.json",
+        statsOptions: null,
+        logLevel: "info"
+      })
+    )
   }
+
+  return {
+    entry: {
+      app: './src/main.js',
+      demo: './src/views/demo/demo.js'
+    },
+    output: {
+      publicPath: isProduction ? './' : '/',
+      path: resolvePath('deploy'),
+      filename: '[name]-[hash:5].bundle.js',
+      chunkFilename: '[name]-[hash:5].chunk.js'
+    },
+    resolve: {
+      alias: {
+        "@s": resolvePath('src/styles'), // 基础样式
+        "@t": resolvePath('src/templates'), // 模块路径
+        "@u": resolvePath('src/utils'), // 工具路径
+      }
+    },
+    module: {
+      rules: [
+        // { test: /\.(htm|html)$/, use: htmlLoader },
+        { test: /\.(sa|sc|c)ss$/, use: styleLoader },
+        { test: /\.js$/, exclude: /(node_modules)/, use: scriptLoader },
+        { test: /\.(eot|woff2?|ttf|svg)$/, use: fontLoader },
+        { test: /\.(png|jpg|jpeg|gif)$/, use: imageLoader },
+        { test: /\.art$/, use: artLoader },
+      ]
+    },
+    plugins
+  }
+}
+
+module.exports = env => {
+  const isProduction =
+    (env === 'production' || env === 'report' || env === 'css')
+      ? true
+      : false
+  let config =
+    isProduction
+      ? productionConfig
+      : developmentConfig
+  // 合并 公共配置 和 环境配置
+  return merge(generateConfig(env, isProduction), config)
 }

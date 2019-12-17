@@ -22,7 +22,7 @@ var utils = {
   },
 
   toLoginPage: function (returnUrl) {
-    var passport = 'https://plogin.m.jd.com/user/login.action?appid=877&returnurl='
+    var passport = '//google.com/user/login.action?appid=google&returnurl='
     var redirectUrl = `${passport}${encodeURIComponent(returnUrl || window.location.href)}`
     window.location.href = redirectUrl
   },
