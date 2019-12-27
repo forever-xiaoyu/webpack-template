@@ -1,7 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
 const merge = require('webpack-merge')
-const glob = require('glob')
 const resolvePath = dir => path.join(__dirname, '..', dir)
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
@@ -12,7 +11,7 @@ const WebpackBar = require('webpackbar')
 const developmentConfig = require('./webpack.dev.conf')
 const productionConfig = require('./webpack.prod.conf')
 const Config = require('./config')
-
+const { getEntry, getHtmlPlugins } = require('./extra.conf')
 
 /**
  * 根据不同的环境，生成不同的配置
@@ -183,55 +182,6 @@ const generateConfig = (env, isProduction) => {
       ]
     },
     plugins
-  }
-}
-
-function getHtmlPlugins () {
-  var entryObj = getEntry()
-  var htmlArray = []
-  var plugins = []
-  Object.keys(entryObj).forEach(function(element){
-    htmlArray.push({
-      _html: element,
-      title: '',
-      chunks: [element]
-    })
-  })
-
-  //自动生成html模板
-  htmlArray.forEach(function(element){
-    plugins.push(new HtmlWebpackPlugin(getHtmlConfig(element._html,element.chunks)));
-  })
-  
-  return plugins
-}
-
-function getEntry () {
-  let entry = {
-  }
-  // 读取所有页面的入口文件
-  glob.sync('./src/views/**/*.js').forEach(name => {
-    var start = name.indexOf('src/') + 4
-      var end = name.length - 3
-      var eArr = []
-      var n = name.slice(start,end)
-      n= n.split('/')[1]
-      eArr.push(name)
-      entry[n] = eArr
-  })
-  return entry
-}
-
-function getHtmlConfig (name, chunks) {
-  return {
-    template: resolvePath(`./src/views/${name}/${name}.html`),
-    filename: `${name}.html`,
-    inject: true,
-    hash: false,
-    chunks: [name],
-    minify: {
-      collapseWhitespace: true
-    }
   }
 }
 

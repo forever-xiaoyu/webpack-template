@@ -4,7 +4,6 @@ const resolvePath = dir => path.join(__dirname, '..', dir)
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const htmlChunks = {
   error: ['app'],
-  authority: ['app'],
 }
 
 function getHtmlPlugins () {
