@@ -18,7 +18,7 @@ function getHtmlPlugins () {
     })
   })
 
-  //自动生成html模板
+  // auto generate html template
   htmlArray.forEach(function(element){
     plugins.push(new HtmlWebpackPlugin(getHtmlConfig(element._html,element.chunks)));
   })
@@ -29,7 +29,7 @@ function getHtmlPlugins () {
 function getEntry () {
   let entry = {
   }
-  // 读取所有页面的入口文件
+  // read all entries of pages
   glob.sync('./src/views/**/*.js').forEach(name => {
     var start = name.indexOf('src/') + 4
     var end = name.length - 3
@@ -43,9 +43,10 @@ function getEntry () {
 }
 
 function getHtmlConfig (name, chunks) {
-  // 是否存在额外的 chunk
+  // get extra chunks
   let extraChunks = htmlChunks[name]
   return {
+    title: 'title',
     template: resolvePath(`./src/views/${name}/${name}.html`),
     filename: `${name}.html`,
     inject: true,
