@@ -7,6 +7,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const DropConsoleWebpackPlugin = require('drop-console-webpack-plugin')
 const WebpackBar = require('webpackbar')
 const developmentConfig = require('./webpack.dev.conf')
 const productionConfig = require('./webpack.prod.conf')
@@ -133,6 +134,11 @@ const generateConfig = (env, isProduction) => {
             : Config.BASE_URL_DEV,
       }
     }),
+    
+    // 移除 console
+    new DropConsoleWebpackPlugin({
+      drop_console: isProduction ? true : false
+    })
   ]
 
   // 模块打包可视化分析
